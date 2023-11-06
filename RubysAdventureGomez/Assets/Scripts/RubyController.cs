@@ -5,16 +5,17 @@ using UnityEngine.UIElements;
 
 public class RubyController : MonoBehaviour
 {
+    public float speed = 3.0f;
+
     public int maxHealth = 5;
-    /* i dont see why the edit in line 13/14 is necessary on collectables
-     * in the video tutorial he put the wrong variable in HealthCollectable
-     * the variable he put was "CurrentHealth" instead of currentHealth, if the capital was changed it wouldve likely worked.
-     * but i dont know, im not the teacher. just a thought. */
+    public float timeInvincible = 2.0f;
+
     public int health { get { return currentHealth; } }
     int currentHealth;
 
-    public float speed = 3.0f;
-    
+    bool isInvincible;
+    float invincibleTimer;
+
     Rigidbody2D rigidbody2d;
     float horizontal;
     float vertical;
@@ -32,6 +33,13 @@ public class RubyController : MonoBehaviour
     {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
+
+        if (isInvincible)
+        {
+            invincibleTimer -= Time.deltaTime;
+            if (invincibleTimer < 0)
+                isInvincible = false;
+        }
     }
 
     void FixedUpdate()
@@ -45,7 +53,16 @@ public class RubyController : MonoBehaviour
 
     public void ChangeHealth(int amount)
     {
-        currentHealth = Mathf.Clamp(currentHealth+ amount, 0, maxHealth);
+        if (amount < 0)
+        {
+            if (isInvincible)
+                return;
+
+            isInvincible = true;
+            invincibleTimer = timeInvincible;
+        }
+
+        currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         Debug.Log(currentHealth + "/" + maxHealth);
     }
 }
