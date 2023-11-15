@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour
@@ -8,7 +9,12 @@ public class EnemyController : MonoBehaviour
     public bool vertical;
     public float changeTime = 3.0f;
 
+    public ParticleSystem smokeEffect;
+
     Rigidbody2D rigidbody2D;
+
+    bool broken = true;
+
     float timer;
     int direction = 1;
 
@@ -24,6 +30,10 @@ public class EnemyController : MonoBehaviour
 
     void Update()
     {
+        if (!broken)
+        {
+            return;
+        }
         timer -= Time.deltaTime;
 
         if (timer < 0)
@@ -35,6 +45,10 @@ public class EnemyController : MonoBehaviour
     }
     void FixedUpdate()
     {
+        if (!broken)
+        {
+            return;
+        }
         Vector2 position = rigidbody2D.position;
 
         if (vertical)
@@ -61,5 +75,13 @@ public class EnemyController : MonoBehaviour
         {
             player.ChangeHealth(-1);
         }
+    }
+
+    public void Fix()
+    {
+        broken = false;
+        rigidbody2D.simulated = false;
+        animator.SetTrigger("Fixed");
+        smokeEffect.Stop();
     }
 }
